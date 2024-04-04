@@ -1,11 +1,9 @@
 import { useState } from "react" ;
-import {useDispatch, useSelector} from 'react-redux' ;
+import {useDispatch} from 'react-redux' ;
 import { addTodo } from "../features/todo/todoSlice";
 
 
 function AddTodo() {
-    
-    const inputLabel = useSelector(state => state.todos)
 
     const [input ,setInput] = useState("") ;
     const dispatch = useDispatch() ;
@@ -13,7 +11,7 @@ function AddTodo() {
     const addTodoHandler =(e) =>{
         e.preventDefault() ;
         dispatch(addTodo(input)) ;
-        setInput("") ;
+        setInput("")
     }
 
 
@@ -30,7 +28,7 @@ function AddTodo() {
         type="submit"
         className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
       >
-        {inputLabel}
+        Add Todo
       </button>
     </form>
   )
