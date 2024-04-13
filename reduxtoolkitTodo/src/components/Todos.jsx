@@ -1,22 +1,52 @@
-import { useSelector, useDispatch } from 'react-redux'
-import {removeTodo, updateTodo} from '../features/todo/todoSlice'
+import { useSelector, useDispatch } from "react-redux";
+import { removeTodo, updateTodo } from "../features/todo/todoSlice";
+import { useState } from "react";
 
 function Todos() {
-    const todos = useSelector(state => state.todos)
-    const dispatch = useDispatch()
+  const todos = useSelector((state) => state.todos);
+  const dispatch = useDispatch();
+
+  const [editingTodoId, setEditingTodoId] = useState(null); // Track currently edited todo ID
+  const [editedText, setEditedText] = useState(""); // Store edited text for update
+
+  const handleEditClick = (todoId) => {
+    setEditingTodoId(todoId); // Mark todo as being edited
+    setEditedText(todos.find((todo) => todo.id === todoId).text); // Pre-fill input with existing text
+  };
+
+  const handleUpdateClick = (todoId) => {
+    if (!editedText.trim()) {
+      // Prevent empty updates
+      return;
+    }
+
+    dispatch(updateTodo({ id: todoId, text: editedText })); // Dispatch update action
+    setEditingTodoId(null); // Clear editing state
+    setEditedText(""); // Reset edited text
+  };
 
   return (
     <>
-    <div>Todos</div>
-    <ul className="list-none">
+      <div>Todos</div>
+      <ul className="list-none">
         {todos.map((todo) => (
           <li
-            className="mt-4 flex justify-between items-center bg-zinc-800 px-4 py-2 rounded"
             key={todo.id}
+            className="mt-4 flex justify-between items-center bg-zinc-800 px-4 py-2 rounded"
           >
-            <div className='text-white'>{todo.text}</div>
+            {editingTodoId === todo.id ? ( // Render input for editing mode
+              <input
+                type="text"
+                className="text-white w-full border border-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:text-black "
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                onBlur={() => handleUpdateClick(todo.id)} // Update on blur or button click
+              />
+            ) : (
+              <div className="text-white">{todo.text}</div>
+            )}
             <button
-             onClick={() => dispatch(removeTodo(todo.id))}
+              onClick={() => dispatch(removeTodo(todo.id))}
               className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
             >
               <svg
@@ -34,15 +64,17 @@ function Todos() {
                 />
               </svg>
             </button>
-            <button onClick={()=> dispatch(updateTodo(todo.id))} className='text-white text-bold' >
-                Update
+            <button
+              onClick={() => handleEditClick(todo.id)}
+              className="text-white text-bold"
+            >
+              Update
             </button>
-
           </li>
         ))}
       </ul>
     </>
-  )
+  );
 }
 
-export default Todos
+export default Todos;
